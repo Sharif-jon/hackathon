@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MazzaMi - Discoveries</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -35,7 +35,7 @@
         import { getFirestore, collection, query, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // --- Global Firebase Configuration and Utility ---
-        const YOUR_FIREBASE_CONFIG = {}; 
+        const YOUR_FIREBASE_CONFIG = {};
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : YOUR_FIREBASE_CONFIG;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-travel-app';
@@ -50,12 +50,12 @@
         let locations = [];
         let currentFilter = 'all';
         let currentSearchTerm = '';
-        let currentSort = 'newest'; 
-        let currentView = 'list'; 
+        let currentSort = 'newest';
+        let currentView = 'list';
         let selectedLocationId = null;
-        
+
         // State to track liked location IDs (Mock data seeded with 'm2')
-        let likedLocationIds = new Set(['m2']); 
+        let likedLocationIds = new Set(['m2']);
 
         // --- Mock Data Setup ---
         const MOCK_LOCATIONS = [
@@ -99,8 +99,8 @@
             const el = document.getElementById(elementId);
             if (el) {
                 el.textContent = message;
-                el.className = isError 
-                    ? 'text-accent font-bold p-2 bg-red-100 rounded border border-accent' 
+                el.className = isError
+                    ? 'text-accent font-bold p-2 bg-red-100 rounded border border-accent'
                     : 'text-secondary font-bold p-2 bg-blue-50 rounded border border-secondary';
                 setTimeout(() => el.textContent = '', 5000);
             }
@@ -114,7 +114,7 @@
                 likedLocationIds.add(locationId);
                 showMessage('like-status', 'Added to Favorites');
             }
-            
+
             if (currentView === 'detail') {
                 renderDetailView(locationId);
             } else if (currentView === 'profile') {
@@ -167,7 +167,7 @@
         const calculatePopularity = (location) => {
             const avgRating = location.reviews && location.reviews.length > 0
                 ? location.reviews.reduce((sum, r) => sum + r.rating, 0) / location.reviews.length
-                : 3.0; 
+                : 3.0;
             return Math.max(0, (0.7 * (location.clicks || 0)) + (0.3 * (avgRating * 20)));
         };
 
@@ -191,7 +191,7 @@
             } else if (view === 'profile') {
                 renderProfileView();
             }
-            window.scrollTo(0, 0); 
+            window.scrollTo(0, 0);
         };
 
         const handleReviewSubmission = async (e) => {
@@ -249,10 +249,10 @@
         // --- Rendering Functions ---
 
         const createLocationCard = (location) => {
-            const type = location.type || 'spot'; 
+            const type = location.type || 'spot';
             let iconName = 'compass';
             let typeLabel = 'Discovery';
-            let colorClass = 'bg-white text-primary border-light'; 
+            let colorClass = 'bg-white text-primary border-light';
 
             if (type === 'restaurant') {
                 iconName = 'chef-hat';
@@ -344,7 +344,7 @@
 
             const imageBanner = location.imageURL ? `
                 <img src="${location.imageURL}" onerror="this.onerror=null;this.src='https://placehold.co/1000x300/A8DADC/1D3557?text=No+Image'" alt="${location.title}" class="w-full h-64 object-cover rounded-xl shadow-lg mb-8 border-4 border-white" />` : '';
-            
+
             const mapIframe = `<iframe title="Location Map" width="100%" height="300" loading="lazy" allowfullscreen frameborder="0" style="border:0; border-radius: 0.75rem;" src="https://maps.google.com/maps?q=${lat},${lon}&hl=en&z=14&output=embed"></iframe>`;
 
             const reviewsHtml = location.reviews && location.reviews.length > 0 ?
@@ -387,7 +387,7 @@
                     </button>
                 </form>
             `;
-            
+
             // LIKE BUTTON LOGIC
             const isLiked = likedLocationIds.has(location.id);
             // Use the new Accent color for the heart
@@ -397,7 +397,7 @@
 
             detailContent.innerHTML = `
                 ${imageBanner}
-                
+
                 <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-4">
                     <h2 class="text-3xl font-extrabold text-primary">${location.title}</h2>
                     <button id="like-button" class="mt-2 md:mt-0 flex items-center space-x-2 px-4 py-2 rounded-full border ${likeButtonBorder} hover:bg-offwhite transition duration-150 shadow-sm bg-white">
@@ -492,7 +492,7 @@
                 });
             });
             userReviews.sort((a, b) => b.createdAt - a.createdAt);
-            const recentReviews = userReviews.slice(0, 5); 
+            const recentReviews = userReviews.slice(0, 5);
 
             const favoritePlaces = locations.filter(loc => likedLocationIds.has(loc.id));
 
@@ -616,10 +616,10 @@
                 if (currentFilter === 'all') return (loc.type === 'restaurant' || loc.type === 'cafe');
                 return (loc.type === currentFilter);
             });
-            
+
             if (currentSearchTerm) {
                 const term = currentSearchTerm.toLowerCase();
-                filteredLocations = locations.filter(loc => { 
+                filteredLocations = locations.filter(loc => {
                     return loc.title.toLowerCase().includes(term) ||
                            loc.description.toLowerCase().includes(term) ||
                            loc.type.toLowerCase().includes(term);
@@ -632,7 +632,7 @@
 
             if (currentSort === 'popular') {
                 filteredLocations.sort((a, b) => calculatePopularity(b) - calculatePopularity(a));
-            } else { 
+            } else {
                 filteredLocations.sort((a, b) => {
                     const timeA = a.createdAt?.toDate ? a.createdAt.toDate().getTime() : a.createdAt;
                     const timeB = b.createdAt?.toDate ? b.createdAt.toDate().getTime() : b.createdAt;
@@ -803,7 +803,7 @@
                 btn.className = `px-4 py-2 rounded-lg text-sm font-medium transition duration-150`;
                 if (isActive) {
                     // Apply palette colors (Secondary Blue) to Active Filter
-                    btn.classList.add('bg-secondary', 'text-white', 'shadow-lg'); 
+                    btn.classList.add('bg-secondary', 'text-white', 'shadow-lg');
                 } else {
                     btn.classList.add('bg-gray-200', 'text-primary', 'hover:bg-light');
                 }
@@ -896,17 +896,17 @@
                     <div>
                         <label for="title" class="block text-sm font-medium text-primary">Title of Discovery</label>
                         <input type="text" name="title" id="title" placeholder="E.g., The Cozy Corner Coffee" required
-                                class="mt-1 block w-full rounded-lg border-light shadow-sm p-3 focus:border-secondary focus:ring-secondary" />
+                               class="mt-1 block w-full rounded-lg border-light shadow-sm p-3 focus:border-secondary focus:ring-secondary" />
                     </div>
                     <div>
                         <label for="imageURL" class="block text-sm font-medium text-primary">Photo URL (Optional)</label>
                         <input type="url" name="imageURL" id="imageURL" placeholder="Paste image link here"
-                                class="mt-1 block w-full rounded-lg border-light shadow-sm p-3 focus:border-secondary focus:ring-secondary" />
+                               class="mt-1 block w-full rounded-lg border-light shadow-sm p-3 focus:border-secondary focus:ring-secondary" />
                     </div>
                     <div>
                         <label for="description" class="block text-sm font-medium text-primary">What makes this place special? (Include Coordinates)</label>
                         <textarea name="description" id="description" placeholder="Description... Coordinates: 12.345, -67.890" required rows="3"
-                                class="mt-1 block w-full rounded-lg border-light shadow-sm p-3 focus:border-secondary focus:ring-secondary"></textarea>
+                                  class="mt-1 block w-full rounded-lg border-light shadow-sm p-3 focus:border-secondary focus:ring-secondary"></textarea>
                     </div>
                     <div class="flex flex-wrap gap-4">
                         <label class="flex items-center text-sm font-medium text-primary space-x-2">
@@ -921,7 +921,7 @@
                         </label>
                     </div>
                     <div id="form-status" class="text-center"></div>
-                    <button type="submit" id="submit-button" class="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-xl shadow-lg text-white bg-secondary hover:bg-primary focus:outline-none transition duration-150 ease-in-out">
+                    <button type="submit" id="submit-button" class="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-base font-medium rounded-xl shadow-lg text-white bg-accent hover:bg-red-700 focus:outline-none transition duration-150 ease-in-out">
                         <i data-lucide="send" class="w-5 h-5 mr-2"></i>
                         Submit Discovery
                     </button>
@@ -933,7 +933,7 @@
                     <div class="relative">
                         <i data-lucide="search" class="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-light"></i>
                         <input type="text" id="search-input" placeholder="Search by title, description, or type..."
-                                class="w-full pl-10 pr-4 py-3 border border-light rounded-xl shadow-sm focus:ring-secondary focus:border-secondary" />
+                               class="w-full pl-10 pr-4 py-3 border border-light rounded-xl shadow-sm focus:ring-secondary focus:border-secondary" />
                     </div>
 
                     <div class="flex flex-col sm:flex-row justify-between items-center p-4 bg-white rounded-xl shadow-md border border-light">
@@ -960,7 +960,7 @@
                 </div>
 
                 <div id="discovery-feed" class="space-y-6">
-                    </div>
+                </div>
             </section>
         </div>
 
